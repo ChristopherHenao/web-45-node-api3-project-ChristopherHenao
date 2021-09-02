@@ -66,7 +66,7 @@ router.get('/:id/posts', validateUserId, async (req, res, next) => {
   // RETURN THE ARRAY OF USER POSTS
   // this needs a middleware to verify user id
   try {
-    const posts = await Posts.getById(req.params.id)
+    const posts = await Users.getUserPosts(req.params.id)
     res.json(posts)
   }
   catch (error) {
@@ -74,13 +74,20 @@ router.get('/:id/posts', validateUserId, async (req, res, next) => {
   }
 });
 
-router.post('/:id/posts', (req, res) => {
+router.post('/:id/posts', validateUserId, validatePost, async (req, res, next) => {
   // RETURN THE NEWLY CREATED USER POST
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
+  try {
+    const newPost = await Posts.insert({ text: req.text, user_id: req.params.id })
+    res.json(newPost)
+  }
+  catch (error) {
+    next(error)
+  }
 });
 
-router.use((error, req, res, next) => { // we plug it AFTER the endpoints
+router.use((error, req, res, next) => {
   res.status(error.status || 500).json({ message: error.message })
 });
 
