@@ -38,7 +38,19 @@ function validateUser(req, res, next) {
 }
 
 function validatePost(req, res, next) {
-  // DO YOUR MAGIC
+  const { text } = req.body
+  try {
+    if (!text || !text.trim()) {
+      next({ message: "missing required text field", status: 400 })
+    }
+    else {
+      req.text = text.trim()
+      next()
+    }
+  }
+  catch (error) {
+    next(error)
+  }
 }
 
 // do not forget to expose these functions to other modules
